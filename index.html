@@ -43,17 +43,18 @@
       z-index: 20;
       display: flex;
       justify-content: center;
+      flex-wrap: wrap; /* ป้องกันปุ่มตกขอบจอในมือถือ */
       gap: 10px;
       padding: 0 12px;
     }
 
     button {
-      min-width: 132px;
+      min-width: 110px;
       min-height: 48px;
       border: 0;
       border-radius: 12px;
       padding: 10px 14px;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
       touch-action: manipulation;
@@ -61,6 +62,7 @@
 
     #run-button { background: #ffffff; color: #111111; }
     #status-button { background: #ffd54f; color: #111111; }
+    #speed-button { background: #4fc3f7; color: #111111; } /* สีปุ่มความเร็ว */
 
     .hint {
       display: block;
@@ -98,11 +100,17 @@
       const warningLamp = document.querySelector('#warning-lamp');
       const arLabel = document.querySelector('#ar-label');
       const topPanel = document.querySelector('#top-panel');
+      
       const runButton = document.querySelector('#run-button');
       const statusButton = document.querySelector('#status-button');
+      const speedButton = document.querySelector('#speed-button');
 
       let running = true;
       let warning = false;
+      
+      // ตัวแปรสำหรับปุ่มความเร็ว
+      let isDoubleSpeed = false;
+      const baseSpeed = 220; 
 
       marker.addEventListener('markerFound', () => {
         topPanel.innerHTML = 'พบ Hiro Marker แล้ว — โมเดลมอเตอร์พร้อมใช้งาน<span class="hint">แตะปุ่มด้านล่างเพื่อทดลองควบคุม</span>';
@@ -128,12 +136,23 @@
           arLabel.setAttribute('value', 'MOTOR M1\nSTATUS: WARNING');
           statusButton.textContent = 'เปลี่ยนเป็นปกติ';
         } else {
-          motorBody.setAttribute('color', '#FF9800');
+          motorBody.setAttribute('color', '#1976d2'); 
           warningLamp.setAttribute('color', '#00e676');
           warningLamp.setAttribute('material', 'emissive', '#00c853');
           arLabel.setAttribute('value', 'MOTOR M1\nSTATUS: NORMAL');
           statusButton.textContent = 'จำลองคำเตือน';
         }
+      });
+
+      speedButton.addEventListener('click', () => {
+        isDoubleSpeed = !isDoubleSpeed;
+        
+        // สลับความเร็ว x1 กับ x2
+        const currentSpeed = isDoubleSpeed ? (baseSpeed * 2) : baseSpeed;
+        shaft.setAttribute('spin-control', 'speed', currentSpeed);
+        
+        // สลับข้อความบนปุ่ม
+        speedButton.textContent = isDoubleSpeed ? 'ความเร็วปกติ' : 'เพิ่มความเร็ว x2';
       });
     });
   </script>
@@ -148,6 +167,7 @@
   <div id="controls">
     <button id="run-button" type="button">หยุดมอเตอร์</button>
     <button id="status-button" type="button">จำลองคำเตือน</button>
+    <button id="speed-button" type="button">เพิ่มความเร็ว x2</button>
   </div>
 
   <a-scene
